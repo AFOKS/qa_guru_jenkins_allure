@@ -31,11 +31,18 @@ class RegistrationPage:
     @allure.step("Open url /automation-practice-form")
     def open(self):
         self.driver.get(self.URL)
-        wrapper = self.driver.find_element(By.CSS_SELECTOR, ".practice-form-wrapper")
-        assert "Student Registration Form" in wrapper.text
-        self.driver.execute_script("$('footer').remove()")
-        self.driver.execute_script("$('#fixedban').remove()")
 
+        wrapper = self.driver.find_element(
+            By.CSS_SELECTOR,
+            ".practice-form-wrapper"
+        )
+
+        assert "Student Registration Form" in wrapper.text
+
+        self.driver.execute_script("""
+            document.querySelector('footer')?.remove();
+            document.querySelector('#fixedban')?.remove();
+        """)
     @allure.step("Fill first name field with {first_name}")
     def fill_first_name(self, first_name):
         """Fill first name field"""
