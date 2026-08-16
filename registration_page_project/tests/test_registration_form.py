@@ -21,7 +21,7 @@ def test_successful(setup_browser):
         registration_page.fill_last_name(last_name)
         registration_page.fill_email("alex@egorov.com")
 
-        # Move to pageobject
+         #Move to pageobject
         # driver.find_element(By.CSS_SELECTOR, "#genterWrapper").find_element(
         #     By.XPATH, ".//*[text()='Other']"
         # ).click()
