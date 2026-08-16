@@ -5,26 +5,33 @@ from selenium.webdriver.chrome.options import Options
 from utils import attach
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def setup_browser():
+    capabilities = {
+        "browserName": "chrome",
+        "browserVersion": "149.0",
+        "selenoid:options": {
+            "name": "Manual session",
+            "sessionTimeout": "60m",
+            "screenResolution": "1920x1080x24",
+            "timeZone": "UTC",
+            "labels": {"manual": "true"},
+            "enableVNC": True,
+            "enableVideo": True,
+            "enableHAR": False,
+            "enableLog": False,
+        },
+    }
+
     options = Options()
 
-    selenoid_capabilities = {
-        "browserName": "chrome",
-        "browserVersion": '128.0',
-        "selenoid:options": {
-            "enableVNC": True,
-            "enableVideo": True
-        }
-    }
-    options.capabilities.update(selenoid_capabilities)
+    for key, value in capabilities.items():
+        options.set_capability(key, value)
 
     driver = webdriver.Remote(
-        command_executor="https://user1:1234@selenoid.autotests.cloud/wd/hub",
-        options=options
+        command_executor="https://qa_engineer:-aAb_-4gs53FD@selenoid.qa.guru/wd/hub",
+        options=options,
     )
-
-    # driver = webdriver.Chrome(options=options)
 
     yield driver
 
