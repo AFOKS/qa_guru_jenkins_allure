@@ -1,0 +1,140 @@
+import os
+
+import pytest
+from dotenv import load_dotenv
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+
+
+load_dotenv()
+
+
+def pytest_addoption(parser):
+    parser.addoption(
+        "--site-url",
+        default="https://demoqa.com/automation-practice-form",
+        help="URL of the tested site"
+    )
+
+    parser.addoption(
+        "--browser",
+        default="chrome",
+        choices=("chrome", "firefox"),
+        help="Browser name"
+    )
+
+    parser.addoption(
+        "--browser-version",
+        default="149.0",
+        help="Browser version"
+    )
+
+    parser.addoption(
+        "--headless",
+        action="store_true",
+        help="Run browser in headless mode"
+    )
+
+    parser.addoption(
+        "--resolution",
+        default="1920x1080",
+        help="Browser resolution"
+    )
+
+
+@pytest.fixture(scope="session")
+def site_url(request):
+    return request.config.getoption("--site-url")
+
+
+@pytest.fixture(scope="session")
+def browser(request):
+    return request.config.getoption("--browser")
+
+
+@pytest.fixture(scope="session")
+def browser_version(request):
+    return request.config.getoption("--browser-version")
+
+
+@pytest.fixture(scope="session")
+def headless(request):
+    return request.config.getoption("--headless")
+
+
+@pytest.fixture(scope="session")
+def resolution(request):
+    return request.config.getoption("--resolution")
+
+
+@pytest.fixture(scope="function")
+def setup_browser(
+    browser,
+    browser_version,
+    headless,
+    resolution
+):
+    login = os.getenv("SELENOID_LOGIN")
+    password = os.getenv("SELENOID_PASSWORD")
+    selenoid_url = os.getenv("SELENOID_URL")
+
+    if not login:
+        raise ValueError("SELENOID_LOGIN is not set")
+
+    if not password:
+        raise ValueError("SELENOID_PASSWORD is not set")
+
+    if not selenoid_url:
+        raise ValueError("SELENOID_URL is not set")
+
+    if browser == "chrome":
+        options = ChromeOptions()
+    elif browser == "firefox":
+        options = FirefoxOptions()
+    else:
+        raise ValueError(f"Unsupported browser: {browser}")
+
+    if headless:
+        options.add_argument("--headless")
+
+    options.set_capability(
+        "browserName",
+        browser
+    )
+
+    options.set_capability(
+        "browserVersion",
+        browser_version
+    )
+
+    options.set_capability(
+        "selenoid:options",
+        {
+            "name": "QA Guru test",
+            "sessionTimeout": "60m",
+            "screenResolution": "1920x1080x24",
+            "timeZone": "UTC",
+            "labels": {
+                "test": "registration_form"
+            },
+            "enableVNC": not headless,
+            "enableVideo": not headless,
+            "enableHAR": False,
+            "enableLog": False,
+        }
+    )
+
+    command_executor = (
+        f"https://{login}:{password}@"
+        f"{selenoid_url.removeprefix('https://')}"
+    )
+
+    driver = webdriver.Remote(
+        command_executor=command_executor,
+        options=options
+    )
+
+    yield driver
+
+    driver.quit()
