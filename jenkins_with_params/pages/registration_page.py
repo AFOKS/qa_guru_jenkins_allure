@@ -33,13 +33,14 @@ class RegistrationPage:
 
     SUCCESS_TITLE = (By.ID, "example-modal-sizes-title-lg")
 
-    def __init__(self, driver):
+    def __init__(self, driver, url):
         self.driver = driver
+        self.url = url
         self.wait = WebDriverWait(driver, 10)
 
     @allure.step("Open url /automation-practice-form")
     def open(self):
-        self.driver.get(self.URL)
+        self.driver.get(self.url)
 
         wrapper = self.driver.find_element(
             By.CSS_SELECTOR,
