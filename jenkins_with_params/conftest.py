@@ -68,16 +68,11 @@ def resolution(request):
     return request.config.getoption("--resolution")
 
 
-@pytest.fixture(scope="function")
-def setup_browser(
-    browser,
-    browser_version,
-    headless,
-    resolution
-):
+@pytest.fixture(scope="session")
+def selenoid_url():
     login = os.getenv("SELENOID_LOGIN")
     password = os.getenv("SELENOID_PASSWORD")
-    selenoid_url = os.getenv("SELENOID_URL")
+    selenoid_host = os.getenv("SELENOID_URL")
 
     if not login:
         raise ValueError("SELENOID_LOGIN is not set")
@@ -85,9 +80,28 @@ def setup_browser(
     if not password:
         raise ValueError("SELENOID_PASSWORD is not set")
 
-    if not selenoid_url:
+    if not selenoid_host:
         raise ValueError("SELENOID_URL is not set")
 
+    # Убираем протокол, если он указан в .env
+    selenoid_host = selenoid_host.removeprefix("https://")
+    selenoid_host = selenoid_host.removeprefix("http://")
+
+    # Убираем /wd/hub, если он случайно указан в .env
+    selenoid_host = selenoid_host.removesuffix("/wd/hub")
+    selenoid_host = selenoid_host.rstrip("/")
+
+    return f"https://{login}:{password}@{selenoid_host}/wd/hub"
+
+
+@pytest.fixture(scope="function")
+def setup_browser(
+    browser,
+    browser_version,
+    headless,
+    resolution,
+    selenoid_url
+):
     if browser == "chrome":
         options = ChromeOptions()
     elif browser == "firefox":
@@ -95,25 +109,15 @@ def setup_browser(
     else:
         raise ValueError(f"Unsupported browser: {browser}")
 
-    if headless:
-        options.add_argument("--headless")
-
-    options.set_capability(
-        "browserName",
-        browser
-    )
-
-    options.set_capability(
-        "browserVersion",
-        browser_version
-    )
+    options.set_capability("browserName", browser)
+    options.set_capability("browserVersion", browser_version)
 
     options.set_capability(
         "selenoid:options",
         {
             "name": "QA Guru test",
             "sessionTimeout": "60m",
-            "screenResolution": "1920x1080x24",
+            "screenResolution": f"{resolution}x24",
             "timeZone": "UTC",
             "labels": {
                 "test": "registration_form"
@@ -125,13 +129,8 @@ def setup_browser(
         }
     )
 
-    command_executor = (
-        f"https://{login}:{password}@"
-        f"{selenoid_url.removeprefix('https://')}"
-    )
-
     driver = webdriver.Remote(
-        command_executor=command_executor,
+        command_executor=selenoid_url,
         options=options
     )
 
