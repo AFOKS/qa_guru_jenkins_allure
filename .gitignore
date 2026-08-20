@@ -148,7 +148,7 @@ activemq-data/
 *.sage.py
 
 # Environments
-prod.env
+.env
 .envrc
 .venv
 env/
@@ -220,5 +220,5 @@ __marimo__/
 #Allure
 allure-results/
 
-prod.env
+.env
 *.env
