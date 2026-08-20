@@ -6,9 +6,13 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 
+from utils.attach import (
+    add_screenshot,
+    add_page_source,
+    add_video,
+)
 
 load_dotenv()
-
 
 def pytest_addoption(parser):
     parser.addoption(
@@ -136,5 +140,10 @@ def setup_browser(
     )
 
     yield driver
+
+    # Allure attachments
+    add_screenshot(driver)
+    add_page_source(driver)
+    add_video(driver)
 
     driver.quit()
