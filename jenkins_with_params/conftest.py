@@ -123,8 +123,8 @@ def setup_browser(
             "labels": {
                 "test": "registration_form"
             },
-            "enableVNC": not headless,
-            "enableVideo": not headless,
+            "enableVNC": True,
+            "enableVideo": True,
             "enableHAR": False,
             "enableLog": False,
         }
