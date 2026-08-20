@@ -9,6 +9,7 @@ from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from utils.attach import (
     add_screenshot,
     add_page_source,
+    add_console_logs,
     add_video,
 )
 
@@ -144,6 +145,7 @@ def setup_browser(
     # Allure attachments
     add_screenshot(driver)
     add_page_source(driver)
+    add_console_logs(driver)
     add_video(driver)
 
     driver.quit()
