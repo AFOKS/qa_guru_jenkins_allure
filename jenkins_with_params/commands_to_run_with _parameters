@@ -2,36 +2,36 @@
 allure serve ./allure-results
 
 # рабочий запуск
-pytest -s jenkins_with_params/tests/test_registation_form.py \
+pytest -s jenkins_with_params/tests/test_registration_form.py \
     --browser=chrome \
     --browser-version=149.0
 
 # Headless
-pytest -s jenkins_with_params/tests/test_registation_form.py \
+pytest -s jenkins_with_params/tests/test_registration_form.py \
     --browser=chrome \
     --browser-version=149.0 \
     --headless
 
 # Другое разрешение
-pytest -s jenkins_with_params/tests/test_registation_form.py \
+pytest -s jenkins_with_params/tests/test_registration_form.py \
     --browser=chrome \
     --browser-version=149.0 \
     --resolution=1280x720
 
 # Другой сайт
 
-pytest -s jenkins_with_params/tests/test_registation_form.py \
+pytest -s jenkins_with_params/tests/test_registration_form.py \
     --site-url="https://demoqa.com/automation-practice-form"
 
-pytest -s jenkins_with_params/tests/test_registation_form.py \
+pytest -s jenkins_with_params/tests/test_registration_form.py \
     --browser=$BROWSER
     --browser-version=$BROWSER_VERSION
-    --hedless=$HEADLESS
+    --headless=$HEADLESS
 
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-pytest . pytest -s jenkins_with_params/tests/test_registation_form.py \
+pytest . pytest -s jenkins_with_params/tests/test_registration_form.py \
     --browser=$BROWSER
     --browser-version=$BROWSER_VERSION
-    --hedless=$HEADLESS
+    --headless=$HEADLESS
